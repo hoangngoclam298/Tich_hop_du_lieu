@@ -63,7 +63,8 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "crawl_THDL.pipelines.CrawlThdlPipeline": 300,
+    "crawl_THDL.pipelines.CrawlerPipeline": 300,
+
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -100,4 +101,8 @@ DEFAULT_REQUEST_HEADERS = {
 }
 
 FEED_EXPORT_ENCODING = 'utf-8'
+
+MONGODB_URI = "mongodb://localhost:27017"
+MONGODB_DATABASE = "crawler"
+MONGODB_COLLECTION = "cafef"
 
