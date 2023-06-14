@@ -6,7 +6,7 @@ import time
 class IbatdongsanSpider(scrapy.Spider):
     name = "ibatdongsan"
     allowed_domains = ["i-batdongsan.com"]
-    base_urls = ["https://i-batdongsan.com"]
+    base_url = "https://i-batdongsan.com/can-ban-can-ho-chung-cu/p"
 
     def start_requests(self):
         start_urls = [
@@ -14,6 +14,10 @@ class IbatdongsanSpider(scrapy.Spider):
         ]
         for url in start_urls:
             yield scrapy.Request(url=url, callback=self.parse)
+        for x in range(1, 537):
+            url_page = self.base_url + str(x) + '.htm'
+            yield scrapy.Request(url=url_page, callback=self.parse)
+
 
     def parse(self, response):
         products = response.css('.content-item')
@@ -45,6 +49,5 @@ class IbatdongsanSpider(scrapy.Spider):
         item['terrace'] = response.css('.property > .moreinfor1 > .infor > table > tr:nth-child(4) > td:nth-child(6) > img::attr(src)').extract_first()
         item['parking'] = response.css('.property > .moreinfor1 > .infor > table > tr:nth-child(5) > td:nth-child(6) > img::attr(src)').extract_first()
         item['url_page'] = response.request.url
-        item['link_image'] = response.css('div.images img::attr(src)').getall()
-
+        item['link_image'] = response.css('div.image-list img::attr(src)').getall()
         yield item

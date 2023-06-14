@@ -6,7 +6,7 @@ import time
 class NhatotSpider(scrapy.Spider):
     name = "mogi"
     allowed_domains = ["mogi.vn"]
-    base_urls = ["https://mogi.vn/mua-can-ho-chung-cu"]
+    base_url = "https://mogi.vn/mua-can-ho-chung-cu?cp="
 
     def start_requests(self):
         start_urls = [
@@ -14,6 +14,9 @@ class NhatotSpider(scrapy.Spider):
         ]
         for url in start_urls:
             yield scrapy.Request(url=url, callback=self.parse)
+        for x in range(1, 3193):
+            url_page = self.base_url + str(x)
+            yield scrapy.Request(url=url_page, callback=self.parse)
 
     def parse(self, response):
         products = response.css('#property > div.property-listing > ul > li')

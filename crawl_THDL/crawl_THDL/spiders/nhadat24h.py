@@ -6,7 +6,7 @@ import time
 class Nhadat24hSpider(scrapy.Spider):
     name = "nhadat24h"
     allowed_domains = ["nhadat24h.net"]
-    base_urls = ["https://nhadat24h.net/ban-can-ho-chung-cu"]
+    base_url = "https://nhadat24h.net/ban-can-ho-chung-cu/page"
 
     def start_requests(self):
         start_urls = [
@@ -14,13 +14,15 @@ class Nhadat24hSpider(scrapy.Spider):
         ]
         for url in start_urls:
             yield scrapy.Request(url=url, callback=self.parse)
+        for x in range(1, 48):
+            url_page = self.base_url + str(x)
+            yield scrapy.Request(url=url_page, callback=self.parse)
 
     def parse(self, response):
         products = response.css('.dv-item')
         for product in products:
             link_product = product.css('a::attr(href)').extract_first()
             yield response.follow(link_product, self.parse_product)
-            break
 
     def parse_product(self, response):
         item = ItemNhatdat24h()

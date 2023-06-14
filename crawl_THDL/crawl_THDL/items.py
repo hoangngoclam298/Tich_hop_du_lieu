@@ -14,7 +14,7 @@ class CrawlThdlItem(scrapy.Item):
 class ItemAlonhadat(scrapy.Item):
     title = Field()
     price = Field()
-    square = Field()
+    area = Field()
     project = Field()
     description = Field()
     road_width = Field()
@@ -111,4 +111,18 @@ class ItemMogi(scrapy.Item):
     phone_contact = Field()
     name_contact = Field()
     link_image = Field()
+    url_page = Field()
+
+
+class ItemHomedy(scrapy.Item):
+    title = Field()
+    price = Field()
+    area = Field()
+    description = Field()
+    address = Field()
+    type = Field()
+    juridical = Field()
+    link_image = Field()
+    name_contact = Field()
+    phone_contact = Field()
     url_page = Field()

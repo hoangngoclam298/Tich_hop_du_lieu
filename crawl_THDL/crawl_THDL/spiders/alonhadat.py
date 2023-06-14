@@ -6,7 +6,7 @@ import time
 class AlonhadatSpider(scrapy.Spider):
     name = "alonhadat"
     allowed_domains = ["alonhadat.com.vn"]
-    base_url = "https://alonhadat.com.vn/nha-dat"
+    base_url = "https://alonhadat.com.vn/nha-dat/can-ban/can-ho-chung-cu/trang--"
 
     def start_requests(self):
         start_urls = [
@@ -14,20 +14,28 @@ class AlonhadatSpider(scrapy.Spider):
         ]
         for url in start_urls:
             yield scrapy.Request(url=url, callback=self.parse)
+        for x in range(1, 1):
+            url_page = self.base_url + str(x) + '.html'
+            yield scrapy.Request(url=url_page, callback=self.parse)
 
     def parse(self, response):
+        while(response.request.url[25:44] == 'xac-thuc-nguoi-dung'):
+            time.sleep(20)
+            yield scrapy.Request(url=response.request.url, callback=self.parse)
         products = response.css('.content-item')
         for product in products:
             link_product = product.xpath('div[3]/a/@href').extract_first()
             yield response.follow(link_product, self.parse_product)
 
     def parse_product(self, response):
+        while(response.request.url[25:44] == 'xac-thuc-nguoi-dung'):
+            time.sleep(20)
+            yield scrapy.Request(url=response.request.url, callback=self.parse_product)
         item = ItemAlonhadat()
-
         item['title'] = response.css('.property > .title > h1::text').extract_first()
         item['date'] = response.css('.property > .title > span::text').extract_first()
         item['price'] = response.css('.property > .moreinfor > .price > .value::text').extract_first()
-        item['square'] = response.css('.property > .moreinfor > .square > .value::text').extract_first()
+        item['area'] = response.css('.property > .moreinfor > .square > .value::text').extract_first()
         item['width'] = response.css('.property > .moreinfor1 > .infor > table > tr:nth-child(4) > td:nth-child(2)::text ').extract_first()
         item['length'] = response.css('.property > .moreinfor1 > .infor > table > tr:nth-child(5) > td:nth-child(2)::text').extract_first()
         item['code'] = response.css('.property > .moreinfor1 > .infor > table > tr:nth-child(1) > td:nth-child(2)::text').extract_first()

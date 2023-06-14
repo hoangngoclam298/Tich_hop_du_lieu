@@ -6,7 +6,7 @@ import time
 class AlomuabannhadatSpider(scrapy.Spider):
     name = "alomuabannhadat"
     allowed_domains = ["alomuabannhadat.vn"]
-    base_url = "https://alomuabannhadat.vn/nha-ban/ban-can-ho-chung-cu/"
+    base_url = "https://alomuabannhadat.vn/nha-ban/ban-can-ho-chung-cu/page-"
 
     def start_requests(self):
         start_urls = [
@@ -14,6 +14,9 @@ class AlomuabannhadatSpider(scrapy.Spider):
         ]
         for url in start_urls:
             yield scrapy.Request(url=url, callback=self.parse)
+        for x in range(1, 120):
+            url_page = self.base_url + str(x)
+            yield scrapy.Request(url=url_page, callback=self.parse)
 
     def parse(self, response):
         products = response.css('.wrap-property > .property')
