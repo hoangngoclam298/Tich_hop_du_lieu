@@ -17,12 +17,14 @@ class Nhadat24hSpider(scrapy.Spider):
         for x in range(1, 48):
             url_page = self.base_url + str(x)
             yield scrapy.Request(url=url_page, callback=self.parse)
+            time.sleep(0.2)
 
     def parse(self, response):
         products = response.css('.dv-item')
         for product in products:
             link_product = product.css('a::attr(href)').extract_first()
             yield response.follow(link_product, self.parse_product)
+            time.sleep(0.2)
 
     def parse_product(self, response):
         item = ItemNhatdat24h()
@@ -45,7 +47,10 @@ class Nhadat24hSpider(scrapy.Spider):
         item['num_wc'] = response.xpath('//*[@id="ContentPlaceHolder1_Panel1"]/div[1]/div[1]/div/div[1]/div[4]/div/table/tbody/tr[2]/td[2]/text()').extract_first()
         item['parking'] = response.xpath('//*[@id="ContentPlaceHolder1_Panel1"]/div[1]/div[1]/div/div[1]/div[7]/div/table/tbody/tr[1]/td[2]/text()').extract_first()
         item['phone_contact'] = response.xpath('//*[@id="viewmobinumber"]/@href').extract_first()
-        item['name_contact'] = response.xpath('//*[@id="ContentPlaceHolder1_Panel1"]/div[1]/div[1]/div/div[2]/div/div[2]/div[1]/div[2]/label[1]/a/text()').extract_first()
+        if(response.xpath('//*[@id="divMainContentCached"]/div[1]/div[1]/div/div[2]/div/div[2]/div[1]/div[2]/label[1]/a/text()').extract_first() != None):
+            item['name_contact'] = response.xpath('//*[@id="divMainContentCached"]/div[1]/div[1]/div/div[2]/div/div[2]/div[1]/div[2]/label[1]/a/text()').extract_first()
+        else:
+            item['name_contact'] = response.xpath('//*[@id="ContentPlaceHolder1_Panel1"]/div[1]/div[1]/div/div[2]/div/div[2]/div[1]/div[2]/label[1]/a/text()').extract_first()
         item['url_page'] = response.request.url
         item['link_image'] = response.css('#ContentPlaceHolder1_ctl00_viewImage1_divLi img::attr(data-src)').getall()
         yield item

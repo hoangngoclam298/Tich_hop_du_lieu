@@ -40,20 +40,6 @@ class NhatotSpider(scrapy.Spider):
         item['url_page'] = response.request.url
         item['link_image'] = response.css('#top-media img::attr(data-src)').getall()
         item['link_image'].append(response.css('#top-media img::attr(src)').extract_first())
-        url_contact = response.css('#mogi-page-content > div.property-detail.clearfix > div.property-detail-main > div.main-info > div.agent-info > div.agent-name > a::attr(href)').extract_first()
-        try:
-            url_contact = 'https://mogi.vn' + url_contact
-            print(url_contact)
-            yield scrapy.Request(url_contact, self.parse_contact, meta={'item': item})
-        except:
-            item['name_contact'] = ''
-            item['phone_contact'] = ''
-        yield item
-
-    def parse_contact(self, response):
-        name = response.css('#agent > div.info > h1::text').extract_first()
-        phone = response.css('#agent > div.info > div.agent-phone > a::text').extract_first()
-        item = response.meta.get('item', {})
-        item['name_contact'] = name
-        item['phone_contact'] = phone
+        item['name_contact'] = response.css('#mogi-page-content > div.property-detail.clearfix > div.side-bar > div.agent-widget.widget > div.agent-info > div.agent-name > a::text').extract_first()
+        item['phone_contact'] = response.css('#mogi-page-content > div.property-detail.clearfix > div.side-bar > div.agent-widget.widget > div.agent-contact.clearfix > a:nth-child(1) > span::attr(ng-bind)').extract_first()
         yield item
