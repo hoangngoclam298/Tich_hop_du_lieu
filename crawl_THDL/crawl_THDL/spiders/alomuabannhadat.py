@@ -1,7 +1,14 @@
 import scrapy
 from ..items import ItemAlomuabannhadat
 import time
+import regex as re
 # -*- coding: utf-8 -*-
+
+def check_date(text):
+    # Sử dụng biểu thức chính quy để tìm kiếm ngày trong văn bản
+    pattern = r"\b(\d{1,2}-\d{1,2}-\d{4})\b"
+    matches = re.findall(pattern, text)
+    return matches
 
 class AlomuabannhadatSpider(scrapy.Spider):
     name = "alomuabannhadat"
@@ -31,12 +38,22 @@ class AlomuabannhadatSpider(scrapy.Spider):
             '//*[@id="quick-summary"]/dl/dd[2]/span/text()').extract_first()
         item['address'] = response.xpath('//*[@id="quick-summary"]/dl/dd[3]/text()').extract_first()
         item['area'] = response.xpath('//*[@id="quick-summary"]/dl/dd[4]/text()').extract_first()
-        item['date'] = response.xpath('//*[@id="quick-summary"]/dl/dd[7]').extract_first()
+        if(len(check_date(response.xpath('//*[@id="quick-summary"]/dl/dd[7]').extract_first())) > 0):
+            item['date'] = check_date(response.xpath('//*[@id="quick-summary"]/dl/dd[7]').extract_first())[0]
+        else:
+            item['date'] = check_date(response.xpath('//*[@id="quick-summary"]/dl/dd[6]').extract_first())[0]
         item['description'] = response.xpath('//*[@id="description"]/p/text()').extract()
         item['code'] = response.xpath('//*[@id="quick-summary"]/dl/dd[1]/text()').extract_first()
         item['features'] = response.xpath('//*[@id="property-features"]/ul//li//text()').getall()
-        item['name_contact'] = response.xpath('//*[@id="quick-summary"]/dl/dd[8]/text()').extract_first()
-        item['phone_contact'] = response.xpath('//*[@id="quick-summary"]/dl/dd[9]/b/a//@onclick').extract_first()
+        '//*[@id="quick-summary"]/dl/dd[7]'
+        if(response.xpath('//*[@id="quick-summary"]/dl/dd[8]/text()').extract_first() != None):
+            item['name_contact'] = response.xpath('//*[@id="quick-summary"]/dl/dd[8]/text()').extract_first()
+        else:
+            item['name_contact'] = response.xpath('//*[@id="quick-summary"]/dl/dd[7]/text()').extract_first()
+        if(response.xpath('//*[@id="quick-summary"]/dl/dd[9]/b/a//@onclick').extract_first() != None):
+            item['phone_contact'] = response.xpath('//*[@id="quick-summary"]/dl/dd[9]/b/a//@onclick').extract_first()
+        else:
+            item['phone_contact'] = response.xpath('//*[@id="quick-summary"]/dl/dd[8]/b/a//@onclick').extract_first()
         item['url_page'] = response.request.url
         item['link_image'] = response.css('#property-gallery img::attr(src)').getall()
         yield item

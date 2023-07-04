@@ -13,14 +13,16 @@ def normalized(text):
     text = text.replace("\n", " ").replace("\r", "")
     return text
 
-def get_num(text):
+def get_phone(text):
     if(text == None):
         return ''
     numbers = re.findall(r'\d+', text)
     res = ''
     for x in numbers:
         res += str(x)
+    res = res[:4] + '.' + res[4:7] + '.' +res[7:]
     return res
+
 def load_item_alomuabannhadat(item):
     prices = item['price']
     prices = prices.split(' ')
@@ -39,7 +41,7 @@ def load_item_alomuabannhadat(item):
         if(x.isdigit()):
             area += x
     if(area != ''):
-        item['area'] = area
+        item['area'] = area + 'm2'
     features = item['features']
     item['length'], item['width'], item['juridical'], item['floor'], item['direct'] = '','','','',''
     for x in features:
@@ -54,11 +56,12 @@ def load_item_alomuabannhadat(item):
             item['floor'] = convert(tmp[1])
         if(convert(tmp[0]) == 'huong xay dung'):
             item['direct'] = convert(tmp[1])
-    item['phone_contact'] = get_num(item['phone_contact'])
+    item['phone_contact'] = get_phone(item['phone_contact'])
     text_desc = ''
     for x in item['description']:
         text_desc += normalized(x)
     item['description'] = text_desc
+    item['date'] = item['date'].replace("-", "/")
     return item
 
 def load_alomuabatnhadat():
@@ -67,7 +70,7 @@ def load_alomuabatnhadat():
 
     with open('alomuabannhadat.csv', 'w', newline="", encoding='utf-8') as f:
         writer = csv.writer(f)
-        header = ['title', 'price', 'address', 'area', 'width', 'length', 'description', 'link_image',
+        header = ['title', 'price', 'address', 'area', 'date', 'width', 'length', 'description', 'link_image',
                   'url_page', 'direct', 'floor', 'juridical', 'name_contact', 'phone_contact']
         writer.writerow(header)
 

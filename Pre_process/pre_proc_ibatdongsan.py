@@ -28,7 +28,7 @@ def get_area(text):
             area = (float(area[0]) + float(area[1]))/2
         if(area == 0):
             return ''
-        return area
+        return str(area)
     except:
         return ''
 
@@ -43,7 +43,6 @@ def check_price(priceo):
         return True, price
     except:
         return False, priceo
-
 
 def load_item_homedy(item):
     item['title'] = normalized(item['title'])
@@ -62,16 +61,21 @@ def load_item_homedy(item):
         item['price'] = price
     except:
         pass
-    item['area'] = get_area(item['area'])
+    item['area'] = get_area(item['area']) + 'm2' if(get_area(item['area']) != '') else ''
     text_desc = ''
     for x in item['description']:
         text_desc += normalized(x)
     item['description'] = text_desc
-    item['width'] = get_area(item['width'])
-    item['length'] = get_area(item['length'])
+    item['width'] = get_area(item['width']) + 'm' if(get_area(item['width']) != '') else ''
+    item['length'] = get_area(item['length']) + 'm' if(get_area(item['length']) != '') else ''
     item['floor'] = item['floor'] if(item['floor'].isdigit()) else ''
     item['direct'] = item['direct'] if (not item['direct'] == '_') else ''
     item['juridical'] = item['juridical'] if (not item['juridical'] == '---') else ''
+    if(item['date'] == 'Hôm nay'):
+        item['date'] = '14/06/2023'
+    elif(item['date'] == 'Hôm qua'):
+        item['date'] = '13/06/2023'
+    item['address'] = item['address'][0]
     return item
 
 def load_ibatdongsan():
@@ -80,7 +84,7 @@ def load_ibatdongsan():
 
     with open('ibatdongsan.csv', 'w', newline="", encoding='utf-8') as f:
         writer = csv.writer(f)
-        header = ['title', 'price', 'address', 'area', 'width', 'length', 'description', 'link_image',
+        header = ['title', 'price', 'address', 'area', 'date', 'width', 'length', 'description', 'link_image',
                   'url_page', 'direct', 'floor', 'juridical', 'name_contact', 'phone_contact']
         writer.writerow(header)
 

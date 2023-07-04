@@ -26,7 +26,7 @@ def get_area(text):
             area = float(area[0])
         elif(len(area)==2):
             area = (float(area[0]) + float(area[1]))/2
-        return area
+        return str(area)
     except:
         return areao
 
@@ -41,6 +41,12 @@ def check_price(priceo):
         return True, price
     except:
         return False, priceo
+
+def get_phone(res):
+    if(res == None):
+        return ''
+    res = res[:4] + '.' + res[4:7] + '.' +res[7:]
+    return res
 
 
 def load_item_homedy(item):
@@ -60,11 +66,18 @@ def load_item_homedy(item):
         item['price'] = price
     except:
         pass
-    item['area'] = get_area(item['area'])
+    item['area'] = get_area(item['area']) + 'm2' if(get_area(item['area']) != '') else ''
     text_desc = ''
     for x in item['description']:
         text_desc += normalized(x)
     item['description'] = text_desc
+    tmp = ''
+    for i in range(len(item['address'])):
+        tmp += item['address'][i]
+        if(i != len(item['address'])-1):
+            tmp += ', '
+    item['address'] = tmp
+    item['phone_contact'] = get_phone(item['phone_contact'])
     return item
 
 def load_homedy():

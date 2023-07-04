@@ -24,7 +24,7 @@ def get_area(text):
     areao = areao.split("M")[0]
     area = areao.replace(",", ".").replace(" ", "")
     try:
-        return float(area)
+        return str(float(area))
     except:
         return ''
 
@@ -52,13 +52,14 @@ def check_price(priceo):
     except:
         return False, priceo
 
-def get_num(text):
+def get_phone(text):
     if(text == None):
         return ''
     numbers = re.findall(r'\d+', text)
     res = ''
     for x in numbers:
         res += str(x)
+    res = res[:4] + '.' + res[4:7] + '.' +res[7:]
     return res
 
 def load_item_nhadat24h(item):
@@ -78,15 +79,15 @@ def load_item_nhadat24h(item):
         item['price'] = price
     except:
         pass
-    item['area'] = get_area(item['area'])
-    item['width'] = get_area(item['width'])
+    item['area'] = get_area(item['area']) + 'm2' if(get_area(item['area']) != '') else ''
+    item['width'] = get_area(item['width']) + 'm' if(get_area(item['width']) != '') else ''
     text_desc = ''
     for x in item['description']:
         text_desc += normalized(x)
     item['description'] = text_desc
     item['name_contact'] = normalized(item['name_contact'])
     item['name_contact'] = re.sub('\s+', ' ', item['name_contact']).strip()
-    item['phone_contact'] = get_num(item['phone_contact'])
+    item['phone_contact'] = get_phone(item['phone_contact'])
     return item
 
 def load_nhadat24h():
